@@ -21,16 +21,16 @@ class AlarmFrame(wx.Frame):
         self.timerNotZero = True
 
         panel = wx.Panel(self)                  # Setup the window layout
-        self.timertext = wx.StaticText(panel, label=self.start_time.Format("%M:%S"), pos=(10, 0))
+        self.timertext = wx.StaticText(panel, label=self.start_time.Format("%M:%S"), pos=(10, -5))
         font = self.timertext.GetFont()
         font.PointSize += 40
         font = font.Bold()
         self.timertext.SetFont(font)
 
-        self.button1 = wx.Button(panel, pos = (180,10), size = (30,30), name="Button1")  #Buttons, 1 - reset 2 - pause
+        self.button1 = wx.Button(panel, pos = (180, 5), size = (30,30), name="Button1")  # Buttons, 1 - reset 2 - pause
         self.button1.SetBitmap(LoadIcon("reset"))
-        self.button2 = wx.Button(panel, pos = (180,50), size = (30,30), name="Button2")
-        self.button2play = LoadIcon("play")
+        self.button2 = wx.Button(panel, pos = (180, 45), size = (30,30), name="Button2")
+        self.button2play = LoadIcon("play")                  # Saving the icons for quickswapping
         self.button2pause = LoadIcon("pause")
         self.button2.SetBitmap(self.button2pause)
 
@@ -87,8 +87,8 @@ class AlarmFrame(wx.Frame):
 
 def LoadIcon(filename):
     """Loads icon files by name"""
-    #wx.Image.AddHandler(wx.PNGHandler)
-    wx.InitAllImageHandlers()
+    #wx.Image.AddHandler(wx.PNGHandler)             # This should work but it doesn't so...
+    wx.InitAllImageHandlers()                       # ...falling back to this instead
 
     filename = "icons/" + filename + ".png"
     image = wx.Image()
@@ -105,7 +105,9 @@ if __name__ == '__main__':
     display = wx.DisplaySize()      # Let's put the app in the bottom right corner by default
     place = display[0] - 300, display[1] - 200
 
-    frame = AlarmFrame(None, title="Alarmpy", size=wx.Size(230,130), pos = place, style = wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX | wx.MINIMIZE_BOX) | wx.STAY_ON_TOP)
+    frame = AlarmFrame(None, title="Alarmpy", size=wx.Size(230,120), pos = place,
+                       style = wx.DEFAULT_FRAME_STYLE & \
+                               ~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX | wx.MINIMIZE_BOX) | wx.STAY_ON_TOP)
     # Window style : no resizing, always on top, no maximize/minimize buttons
 
     frame.Show()
