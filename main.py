@@ -21,14 +21,18 @@ class AlarmFrame(wx.Frame):
         self.timerNotZero = True
 
         panel = wx.Panel(self)                  # Setup the window layout
-        self.st = wx.StaticText(panel, label=self.start_time.Format("%M:%S"), pos=(10, 0))
-        font = self.st.GetFont()
+        self.timertext = wx.StaticText(panel, label=self.start_time.Format("%M:%S"), pos=(10, 0))
+        font = self.timertext.GetFont()
         font.PointSize += 40
         font = font.Bold()
-        self.st.SetFont(font)
+        self.timertext.SetFont(font)
 
-        self.button1 = wx.Button(panel, pos = (180,10), size = (30,30), label="O", name="Button1")  #Buttons, 1 - reset 2 - pause
-        self.button2 = wx.Button(panel, pos = (180,50), size = (30,30), label="II", name="Button2")
+        self.button1 = wx.Button(panel, pos = (180,10), size = (30,30), name="Button1")  #Buttons, 1 - reset 2 - pause
+        self.button1.SetBitmap(LoadIcon("reset"))
+        self.button2 = wx.Button(panel, pos = (180,50), size = (30,30), name="Button2")
+        self.button2play = LoadIcon("play")
+        self.button2pause = LoadIcon("pause")
+        self.button2.SetBitmap(self.button2pause)
 
         self.Bind(wx.EVT_BUTTON, self.OnButton)     # Button event
 
@@ -36,17 +40,18 @@ class AlarmFrame(wx.Frame):
         """Handler for timer event"""
         if self.timerNotZero:           # When timer runs, subtract one second and update text
             self.start_time = self.start_time.Subtract(wx.TimeSpan(0, sec = 1))
-            self.st.SetLabel(self.start_time.Format("%M:%S"))
-            if self.start_time.GetMinutes() == 0 and self.start_time.GetSeconds() == 0:     # We've reached zero
+            self.timertext.SetLabel(self.start_time.Format("%M:%S"))
+            if self.start_time.GetMinutes() == 0 and self.start_time.GetSeconds() == 0:     # Timer reached zero
                 self.timerNotZero = False
+                self.button1.SetBackgroundColour('red')
         else:                               # Once timer stop, makes the text background blink red
             if self.blinkPhase == 0:
-                self.st.SetBackgroundColour('red')
-                self.st.SetLabel("--:--")
+                self.timertext.SetBackgroundColour('red')
+                self.timertext.SetLabel("--:--")
                 self.blinkPhase = 1
             elif self.blinkPhase == 1:
-                self.st.SetBackgroundColour(wx.NullColour)
-                self.st.SetLabel("--:--")
+                self.timertext.SetBackgroundColour(wx.NullColour)
+                self.timertext.SetLabel("--:--")
                 self.blinkPhase = 0
 
     def OnButton(self, event):
@@ -60,23 +65,38 @@ class AlarmFrame(wx.Frame):
     def OnButton1(self):
         """Handler for reset button"""
         self.start_time = self.start_time.Minutes(DEFAULT_TIMER)
-        self.st.SetLabel(self.start_time.Format("%M:%S"))
+        self.timertext.SetLabel(self.start_time.Format("%M:%S"))
         self.timerNotZero = True
         self.blinkPhase = 0
-        self.st.SetBackgroundColour(wx.NullColour)
+        self.timertext.SetBackgroundColour(wx.NullColour)
+        self.button1.SetBackgroundColour(wx.NullColour)
 
     def OnButton2(self):
         """Handler for pause button"""
         if self.timer.IsRunning() & self.timerNotZero:
             self.timer.Stop()
-            self.button2.SetLabel(">")      # Check out the cool ascii art (TODO: use icons instead)
+            self.button2.SetBitmap(self.button2play)
         elif self.timerNotZero:
             self.timer.Start()
-            self.button2.SetLabel("II")
+            self.button2.SetBitmap(self.button2pause)
 
     def OnExit(self, event):
         """Window closing button pressed, shutting down"""
         self.Close(True)
+
+
+def LoadIcon(filename):
+    """Loads icon files by name"""
+    #wx.Image.AddHandler(wx.PNGHandler)
+    wx.InitAllImageHandlers()
+
+    filename = "icons/" + filename + ".png"
+    image = wx.Image()
+
+    with open(filename, mode='rb') as file:
+        image.LoadFile(file, type=wx.BITMAP_TYPE_PNG)
+
+    return image.ConvertToBitmap()
 
 if __name__ == '__main__':
     # Setup the window and show it
