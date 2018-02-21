@@ -50,7 +50,8 @@ class AlarmFrame(wx.Frame):
         self.button2play = LoadIcon("play")                  # Saving the icons for quickswapping
         self.button2pause = LoadIcon("pause")
         self.button2.SetBitmap(self.button2pause)
-        buttonsizer.Add(wx.Button(self, size=(30, 30), label="X", name="Button3"))
+        buttonsizer.Add(wx.Button(self, size=(30, 30), name="Button3"))
+        buttonsizer.Children[4].GetWindow().SetBitmap(LoadIcon("close"))
 
         self.button1.SetBackgroundColour('white')
         self.button2.SetBackgroundColour('white')
@@ -104,8 +105,8 @@ class AlarmFrame(wx.Frame):
         self.timertext.SetLabel(self.start_time.Format("%M:%S"))
         self.timerNotZero = True
         self.blinkPhase = 0
-        self.timertext.SetBackgroundColour(wx.NullColour)
-        self.button1.SetBackgroundColour(wx.NullColour)
+        self.timertext.SetForegroundColour('black')
+        self.button1.SetBackgroundColour('white')
 
     def OnButton2(self):
         """Handler for pause button"""
