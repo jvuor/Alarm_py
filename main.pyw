@@ -20,21 +20,31 @@ class AlarmFrame(wx.Frame):
         self.blinkPhase = 0
         self.timerNotZero = True
 
-        panel = wx.Panel(self)                  # Setup the window layout
-        self.timertext = wx.StaticText(panel, label=self.start_time.Format("%M:%S"), pos=(10, -5))
+        sizer = wx.BoxSizer(wx.VERTICAL)            # making a sizer for the window layout
+
+        sizer.Add(wx.StaticText(self, label=self.start_time.Format("%M:%S")))
+
+        self.timertext = sizer.Children[0].GetWindow()      # a direct reference to the text element
+
         font = self.timertext.GetFont()
         font.PointSize += 40
         font = font.Bold()
         self.timertext.SetFont(font)
 
-        self.button1 = wx.Button(panel, pos = (180, 5), size = (30,30), name="Button1")  # Buttons, 1 - reset 2 - pause
+
+        sizer.Add(wx.Button(self, size = (30,30), name="Button1")) # Buttons, 1 - reset 2 - pause
+        self.button1 = sizer.Children[1].GetWindow()
+        sizer.Add(wx.Button(self, size = (30,30), name="Button2"))
+        self.button2 = sizer.Children[2].GetWindow()
         self.button1.SetBitmap(LoadIcon("reset"))
-        self.button2 = wx.Button(panel, pos = (180, 45), size = (30,30), name="Button2")
         self.button2play = LoadIcon("play")                  # Saving the icons for quickswapping
         self.button2pause = LoadIcon("pause")
         self.button2.SetBitmap(self.button2pause)
 
         self.Bind(wx.EVT_BUTTON, self.OnButton)     # Button event
+
+        self.SetSizer(sizer)
+        self.Layout()
 
     def OnTimer(self, event):
         """Handler for timer event"""
@@ -106,8 +116,7 @@ if __name__ == '__main__':
     place = display[0] - 300, display[1] - 200
 
     frame = AlarmFrame(None, title="Alarmpy", size=wx.Size(230,120), pos = place,
-                       style = wx.DEFAULT_FRAME_STYLE & \
-                               ~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX | wx.MINIMIZE_BOX) | wx.STAY_ON_TOP)
+                       style = wx.BORDER_NONE )
     # Window style : no resizing, always on top, no maximize/minimize buttons
 
     frame.Show()
