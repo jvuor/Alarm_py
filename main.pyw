@@ -67,6 +67,7 @@ class AlarmFrame(wx.Frame):
         sizer.SetSizeHints(self)
 
         self.SetSizer(sizer)
+        self.SetRoundShape()
         self.Layout()
 
     def OnTimer(self, event):
@@ -148,6 +149,10 @@ class AlarmFrame(wx.Frame):
 
         dc.DrawBitmap(bmp, 0, 0, 0)
 
+    def SetRoundShape(self, event=None):
+        w, h = self.GetSize()
+        self.SetShape(GetRoundShape(w, h, 10))
+
     def OnExit(self, event):
         """Window closing button pressed, shutting down"""
         self.Close(True)
@@ -167,6 +172,28 @@ def LoadIcon(filename):
     return image.ConvertToBitmap()
 
 
+def GetRoundBitmap( w, h, r ):
+    """
+    Stolen from https://hasenj.wordpress.com/2009/04/14/making-a-fancy-window-in-wxpython/
+    """
+    maskColor = wx.Colour(0,0,0)
+    shownColor = wx.Colour(5,5,5)
+    b = wx.Bitmap(w,h)
+    dc = wx.MemoryDC(b)
+    dc.SetBrush(wx.Brush(maskColor))
+    dc.DrawRectangle(0,0,w,h)
+    dc.SetBrush(wx.Brush(shownColor))
+    dc.SetPen(wx.Pen(shownColor))
+    dc.DrawRoundedRectangle(0,0,w,h,r)
+    dc.SelectObject(wx.NullBitmap)
+    b.SetMaskColour(maskColor)
+    return b
+
+
+def GetRoundShape( w, h, r ):
+    return wx.Region( GetRoundBitmap(w,h,r) )
+
+
 if __name__ == '__main__':
     # Setup the window and show it
     app = wx.App()
@@ -174,7 +201,7 @@ if __name__ == '__main__':
     display = wx.DisplaySize()      # Let's put the app in the bottom right corner by default
     place = display[0] - 300, display[1] - 200
 
-    frame = AlarmFrame(None, title="Alarmpy", size=(230, 125), pos=place, style=wx.BORDER_NONE | wx.STAY_ON_TOP)
+    frame = AlarmFrame(None, title="Alarmpy", size=(230, 125), pos=place, style=wx.BORDER_NONE | wx.STAY_ON_TOP | wx.FRAME_SHAPED)
 
     frame.Show()
     app.MainLoop()
