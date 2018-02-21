@@ -1,6 +1,7 @@
 import wx
 
-DEFAULT_TIMER = 15 #Length of the timer in minutes
+DEFAULT_TIMER = 15 # Length of the timer in minutes
+
 
 class AlarmFrame(wx.Frame):
     """
@@ -22,7 +23,7 @@ class AlarmFrame(wx.Frame):
 
         sizer = wx.BoxSizer(wx.VERTICAL)            # making a sizer for the window layout
 
-        sizer.Add(wx.StaticText(self, label=self.start_time.Format("%M:%S")))
+        sizer.Add(wx.StaticText(self, label=self.start_time.Format("%M:%S")),  0, wx.ALIGN_CENTER, 0)
 
         self.timertext = sizer.Children[0].GetWindow()      # a direct reference to the text element
 
@@ -31,18 +32,24 @@ class AlarmFrame(wx.Frame):
         font = font.Bold()
         self.timertext.SetFont(font)
 
+        buttonsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        sizer.Add(wx.Button(self, size = (30,30), name="Button1")) # Buttons, 1 - reset 2 - pause
-        self.button1 = sizer.Children[1].GetWindow()
-        sizer.Add(wx.Button(self, size = (30,30), name="Button2"))
-        self.button2 = sizer.Children[2].GetWindow()
+        # Buttons, 1 - reset 2 - pause 3 - shutdown
+        buttonsizer.Add(wx.Button(self, size=(30, 30), name="Button1"))
+        self.button1 = buttonsizer.Children[0].GetWindow()
+        buttonsizer.Add(wx.Button(self, size=(30, 30), name="Button2"))
+        self.button2 = buttonsizer.Children[1].GetWindow()
         self.button1.SetBitmap(LoadIcon("reset"))
         self.button2play = LoadIcon("play")                  # Saving the icons for quickswapping
         self.button2pause = LoadIcon("pause")
         self.button2.SetBitmap(self.button2pause)
+        buttonsizer.Add(wx.Button(self, size=(30, 30), label="X", name="Button3"))
 
         self.Bind(wx.EVT_BUTTON, self.OnButton)     # Button event
 
+        sizer.Add(buttonsizer)
+
+        sizer.SetSizeHints(self)
         self.SetSizer(sizer)
         self.Layout()
 
@@ -71,6 +78,8 @@ class AlarmFrame(wx.Frame):
             self.OnButton1()
         elif button == "Button2":
             self.OnButton2()
+        elif button == "Button3":
+            self.OnExit(event)
 
     def OnButton1(self):
         """Handler for reset button"""
@@ -96,9 +105,9 @@ class AlarmFrame(wx.Frame):
 
 
 def LoadIcon(filename):
-    """Loads icon files by name"""
-    #wx.Image.AddHandler(wx.PNGHandler)             # This should work but it doesn't so...
-    wx.InitAllImageHandlers()                       # ...falling back to this instead
+    """Loads icon files by name, returns wx.BitMaps"""
+    # wx.Image.AddHandler(wx.PNGHandler)             # This should work but it doesn't so...
+    wx.InitAllImageHandlers()                        # ...falling back to this instead
 
     filename = "icons/" + filename + ".png"
     image = wx.Image()
@@ -108,6 +117,7 @@ def LoadIcon(filename):
 
     return image.ConvertToBitmap()
 
+
 if __name__ == '__main__':
     # Setup the window and show it
     app = wx.App()
@@ -115,9 +125,8 @@ if __name__ == '__main__':
     display = wx.DisplaySize()      # Let's put the app in the bottom right corner by default
     place = display[0] - 300, display[1] - 200
 
-    frame = AlarmFrame(None, title="Alarmpy", size=wx.Size(230,120), pos = place,
-                       style = wx.BORDER_NONE )
-    # Window style : no resizing, always on top, no maximize/minimize buttons
+    frame = AlarmFrame(None, title="Alarmpy", pos=place,
+                       style=wx.BORDER_NONE )
 
     frame.Show()
     app.MainLoop()
