@@ -1,6 +1,6 @@
 import wx
 
-DEFAULT_TIMER = 15 #Length of the timer in minutes
+DEFAULT_TIMER = 20 #Length of the timer in minutes
 
 class AlarmFrame(wx.Frame):
     """
