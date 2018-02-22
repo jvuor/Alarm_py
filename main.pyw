@@ -28,7 +28,7 @@ class AlarmFrame(wx.Frame):
 
         sizer = wx.BoxSizer(wx.VERTICAL)            # a sizer for the window layout
 
-        sizer.Add(wx.StaticText(self, label=self.start_time.Format("%M:%S")),  0, wx.LEFT|wx.RIGHT|wx.TOP, border=10)
+        sizer.Add(wx.StaticText(self, label=self.FormatTime()),  0, wx.LEFT|wx.RIGHT|wx.TOP, border=10)
 
         self.timertext = sizer.Children[0].GetWindow()      # a direct reference to the text element
 
@@ -75,7 +75,7 @@ class AlarmFrame(wx.Frame):
         """Handler for timer event"""
         if self.timerNotZero:           # When timer runs, subtract one second and update text
             self.start_time = self.start_time.Subtract(wx.TimeSpan(0, sec=1))
-            self.timertext.SetLabel(self.start_time.Format("%M:%S"))
+            self.timertext.SetLabel(self.FormatTime())
             if self.start_time.GetMinutes() == 0 and self.start_time.GetSeconds() == 0:     # Timer reached zero
                 self.timerNotZero = False
                 self.button1.SetBackgroundColour('red')
@@ -102,7 +102,7 @@ class AlarmFrame(wx.Frame):
     def OnButton1(self):
         """Handler for the reset button"""
         self.start_time = self.start_time.Minutes(DEFAULT_TIMER)
-        self.timertext.SetLabel(self.start_time.Format("%M:%S"))
+        self.timertext.SetLabel(self.FormatTime())
         self.timerNotZero = True
         self.blinkPhase = 0
         self.timertext.SetForegroundColour('black')
@@ -150,6 +150,19 @@ class AlarmFrame(wx.Frame):
     def OnExit(self, event):
         """Window closing button pressed, shutting down"""
         self.Close(True)
+
+    def FormatTime(self):
+        """Returns the time formatted into a string"""
+        timeM = self.start_time.GetMinutes()
+        timeS = self.start_time.GetSeconds()
+        timeDisplay = ""
+
+        if timeM > 0:
+            timeDisplay = str(timeM) + " min"
+        else:
+            timeDisplay = str(timeM) + ":" + str(timeS)
+
+        return timeDisplay
 
 
 def LoadIcon(filename):
